@@ -15,3 +15,7 @@ func proxyPrivateDownload(token string, url string, res gin.ResponseWriter) {
 
 	res.Header().Set("Location", getRes.Header.Get("Location"))
 }
+
+func stringLength(str string) int {
+	return strings.Count(str, "")
+}
