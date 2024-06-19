@@ -1,0 +1,124 @@
+project_name: pecan
+
+before:
+  hooks:
+    - go mod tidy
+
+archives:
+  - name_template: "{{ .ProjectName }}_{{ .Version }}.{{ .Os }}-{{ .Arch }}"
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+
+dockers:
+  - image_templates:
+      - "ghcr.io/quicdrive/{{ .ProjectName }}:{{ .Version }}-amd64"
+    dockerfile: Dockerfile
+    use: buildx
+    build_flag_templates:
+      - --platform=linux/amd64
+      - --label=org.opencontainers.image.licenses=MIT
+      - --label=org.opencontainers.image.description=Electron Update Server in GO
+      - --label=org.opencontainers.image.created={{.Date}}
+      - --label=org.opencontainers.image.name={{.ProjectName}}
+      - --label=org.opencontainers.image.revision={{.FullCommit}}
+      - --label=org.opencontainers.image.version={{.Version}}
+      - --label=org.opencontainers.image.source={{.GitURL}}
+      - --label=io.artifacthub.package.maintainers=[{"name":"Konotorii","email":"konotorii@konotorii.com"}]
+      - --label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/quicdrive/pecan/main/README.md
+      - --label=io.artifacthub.package.keywords=golang,electron,updater
+      - --label=io.artifacthub.package.license=MIT
+  - image_templates:
+      - "ghcr.io/quicdrive/{{ .ProjectName }}:{{ .Version }}-arm64"
+    goarch: arm64
+    dockerfile: Dockerfile
+    use: buildx
+    build_flag_templates:
+      - --platform=linux/amd64
+      - --label=org.opencontainers.image.licenses=MIT
+      - --label=org.opencontainers.image.description=Electron Update Server in GO
+      - --label=org.opencontainers.image.created={{.Date}}
+      - --label=org.opencontainers.image.name={{.ProjectName}}
+      - --label=org.opencontainers.image.revision={{.FullCommit}}
+      - --label=org.opencontainers.image.version={{.Version}}
+      - --label=org.opencontainers.image.source={{.GitURL}}
+      - --label=io.artifacthub.package.maintainers=[{"name":"Konotorii","email":"konotorii@konotorii.com"}]
+      - --label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/quicdrive/pecan/main/README.md
+      - --label=io.artifacthub.package.keywords=golang,electron,updater
+      - --label=io.artifacthub.package.license=MIT
+
+docker_manifests:
+  - name_template: 'ghcr.io/quicdrive/{{ .ProjectName }}:{{ .Version }}'
+    image_templates:
+      - 'ghcr.io/quicdrive/{{ .ProjectName }}:{{ .Version }}-amd64'
+      - 'ghcr.io/quicdrive/{{ .ProjectName }}:{{ .Version }}-arm64'
+  - name_template: 'ghcr.io/quicdrive/{{ .ProjectName }}:latest'
+    image_templates:
+      - 'ghcr.io/quicdrive/{{ .ProjectName }}:{{ .Version }}-amd64'
+      - 'ghcr.io/quicdrive/{{ .ProjectName }}:{{ .Version }}-arm64'
+
+source:
+  enabled: true
+
+sboms:
+  - artifacts: archive
+  - id: source
+    artifacts: source
+
+checksum:
+  name_template: 'checksums.txt'
+
+signs:
+  - cmd: cosign
+    env:
+      - COSIGN_EXPERIMENTAL=1
+    certificate: '${artifact}.pem'
+    args:
+      - sign-blob
+      - '-y'
+      - '--output-certificate=${certificate}'
+      - '--output-signature=${signature}'
+      - '${artifact}'
+    artifacts: checksum
+    output: true
+
+docker_signs:
+  - cmd: cosign
+    env:
+      - COSIGN_EXPERIMENTAL=1
+    artifacts: manifests
+    output: true
+    args:
+      - 'sign'
+      - '-y'
+      - '${artifact}'
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - '^test:'
+      - '^chore'
+      - Merge pull request
+      - Merge remote-tracking branch
+      - Merge branch
+      - go mod tidy
+
+  groups:
+    - title: 'New Features'
+      regexp: "^.*feat[(\\w)]*:+.*$"
+      order: 0
+    - title: 'Bug fixes'
+      regexp: "^.*fix[(\\w)]*:+.*$"
+      order: 10
+    - title: Other work
+      order: 999
