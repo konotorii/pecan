@@ -20,7 +20,7 @@ builds:
 
 dockers:
   - image_templates:
-      - "ghcr.io/quicdrive/{{ .ProjectName }}:{{ .Version }}-amd64"
+      - "ghcr.io/konotorii/{{ .ProjectName }}:{{ .Version }}-amd64"
     dockerfile: Dockerfile
     use: buildx
     build_flag_templates:
@@ -33,11 +33,11 @@ dockers:
       - --label=org.opencontainers.image.version={{.Version}}
       - --label=org.opencontainers.image.source={{.GitURL}}
       - --label=io.artifacthub.package.maintainers=[{"name":"Konotorii","email":"konotorii@konotorii.com"}]
-      - --label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/quicdrive/pecan/main/README.md
+      - --label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/konotorii/pecan/main/README.md
       - --label=io.artifacthub.package.keywords=golang,electron,updater
       - --label=io.artifacthub.package.license=MIT
   - image_templates:
-      - "ghcr.io/quicdrive/{{ .ProjectName }}:{{ .Version }}-arm64"
+      - "ghcr.io/konotorii/{{ .ProjectName }}:{{ .Version }}-arm64"
     goarch: arm64
     dockerfile: Dockerfile
     use: buildx
@@ -51,19 +51,19 @@ dockers:
       - --label=org.opencontainers.image.version={{.Version}}
       - --label=org.opencontainers.image.source={{.GitURL}}
       - --label=io.artifacthub.package.maintainers=[{"name":"Konotorii","email":"konotorii@konotorii.com"}]
-      - --label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/quicdrive/pecan/main/README.md
+      - --label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/konotorii/pecan/main/README.md
       - --label=io.artifacthub.package.keywords=golang,electron,updater
       - --label=io.artifacthub.package.license=MIT
 
 docker_manifests:
-  - name_template: 'ghcr.io/quicdrive/{{ .ProjectName }}:{{ .Version }}'
+  - name_template: 'ghcr.io/konotorii/{{ .ProjectName }}:{{ .Version }}'
     image_templates:
-      - 'ghcr.io/quicdrive/{{ .ProjectName }}:{{ .Version }}-amd64'
-      - 'ghcr.io/quicdrive/{{ .ProjectName }}:{{ .Version }}-arm64'
-  - name_template: 'ghcr.io/quicdrive/{{ .ProjectName }}:latest'
+      - 'ghcr.io/konotorii/{{ .ProjectName }}:{{ .Version }}-amd64'
+      - 'ghcr.io/konotorii/{{ .ProjectName }}:{{ .Version }}-arm64'
+  - name_template: 'ghcr.io/konotorii/{{ .ProjectName }}:latest'
     image_templates:
-      - 'ghcr.io/quicdrive/{{ .ProjectName }}:{{ .Version }}-amd64'
-      - 'ghcr.io/quicdrive/{{ .ProjectName }}:{{ .Version }}-arm64'
+      - 'ghcr.io/konotorii/{{ .ProjectName }}:{{ .Version }}-amd64'
+      - 'ghcr.io/konotorii/{{ .ProjectName }}:{{ .Version }}-arm64'
 
 source:
   enabled: true
