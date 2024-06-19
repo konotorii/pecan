@@ -34,5 +34,29 @@ func main() {
 func engine() *gin.Engine {
 	r := gin.New()
 
+	r.GET("/download", download)
+	r.GET("/download/:platform", downloadPlatform)
+	r.GET("/update/:platform/:version", updatePlatformVersion)
+
 	return r
+}
+
+func download(c *gin.Context) {
+
+}
+
+func downloadPlatform(c *gin.Context) {
+	platform := c.Param("platform")
+
+	if platform == "mac" {
+		platform = "dmg"
+	}
+	if platform == "mac_arm64" {
+		platform = "dmg_arm64"
+	}
+
+}
+
+func updatePlatformVersion(c *gin.Context) {
+
 }
