@@ -1,4 +1,4 @@
-package pecan
+package main
 
 import (
 	"fmt"
