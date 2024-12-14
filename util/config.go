@@ -5,21 +5,25 @@ import (
 	"strconv"
 )
 
-type Config struct {
+type ConfigStruct struct {
 	Account  string
 	Repo     string
 	GitToken string
 	Url      string
 	Owner    string
 	Interval int64
+	Port     int
 }
 
-func ConfigNew() *Config {
-	return &Config{
+var Config ConfigStruct
+
+func ConfigInit() {
+	Config = ConfigStruct{
 		Account:  getEnv("ACCOUNT", ""),
 		Repo:     getEnv("REPOSITORY", ""),
 		GitToken: getEnv("GIT_TOKEN", ""),
 		Url:      getEnv("URL", ""),
+		Port:     getEnvAsInt("PORT", 3000),
 	}
 }
 
