@@ -1,21 +1,14 @@
-package pecan
+package main
 
 import (
 	"errors"
 	"fmt"
 	"io"
+	"pecan/util"
 	"regexp"
 	"strings"
 	"time"
 )
-
-type ConfigStruct struct {
-	token    string
-	repo     string
-	url      string
-	owner    string
-	interval int64
-}
 
 type CacheStruct struct {
 	lastUpdate       time.Time
@@ -28,25 +21,13 @@ type CacheStruct struct {
 
 var cache *CacheStruct
 
-var config *ConfigStruct
+func CacheInit() {
 
-func (t *ConfigStruct) CacheInit(token string, repo string, url string, owner string, interval int64) {
-	t.url = url
-	t.token = token
-	t.repo = repo
-	t.owner = owner
-
-	config.owner = owner
-	config.repo = repo
-	config.url = url
-	config.token = token
-	config.interval = interval
-
-	if stringLength(owner) == 0 || stringLength(repo) == 0 {
+	if stringLength(util.Config.Owner) == 0 || stringLength(util.Config.Repo) == 0 {
 		_ = errors.New("neither OWNER, nor REPO are defined")
 	}
 
-	if stringLength(token) > 0 && stringLength(url) == 0 {
+	if stringLength(util.Config.GitToken) > 0 && stringLength(util.Config.Url) == 0 {
 		_ = errors.New("URL is not defined, which is mandatory for private repo mode")
 	}
 }
@@ -54,8 +35,8 @@ func (t *ConfigStruct) CacheInit(token string, repo string, url string, owner st
 func cacheReleaseList(url string) string {
 	headers := []CustomHeaders{{label: "Accept", value: "application/vnd.github.preview"}}
 
-	if stringLength(config.token) > 0 {
-		authHeader := CustomHeaders{label: "Authorization", value: fmt.Sprintf("Token %s", config.token)}
+	if stringLength(util.Config.GitToken) > 0 {
+		authHeader := CustomHeaders{label: "Authorization", value: fmt.Sprintf("Token %s", util.Config.GitToken)}
 		headers = append(headers, authHeader)
 	}
 
@@ -88,12 +69,12 @@ func cacheReleaseList(url string) string {
 }
 
 func refreshCache() bool {
-	repo := fmt.Sprintf("%o/%r", config.owner, config.repo)
+	repo := fmt.Sprintf("%o/%r", util.Config.Owner, util.Config.Repo)
 	url := fmt.Sprintf("https://api.github.com/repos/%r/releases?per_page_100", repo)
 	headers := []CustomHeaders{{label: "Accept", value: "application/vnd.github.preview"}}
 
-	if stringLength(config.token) > 0 {
-		authHeader := CustomHeaders{label: "Authorization", value: fmt.Sprintf("Token %s", config.token)}
+	if stringLength(util.Config.GitToken) > 0 {
+		authHeader := CustomHeaders{label: "Authorization", value: fmt.Sprintf("Token %s", util.Config.GitToken)}
 		headers = append(headers, authHeader)
 	}
 
@@ -115,7 +96,7 @@ func refreshCache() bool {
 func isOutdated() bool {
 	lastUpdate := cache.lastUpdate
 
-	if time.Now().UnixMilli()-lastUpdate.UnixMilli() > config.interval {
+	if time.Now().UnixMilli()-lastUpdate.UnixMilli() > util.Config.Interval {
 		return true
 	}
 
